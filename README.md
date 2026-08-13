@@ -11,7 +11,7 @@ Combino formación en negocio y datos con experiencia real construyendo software
 
 - 🎓 Cursando la Licenciatura en Negocios Digitales y Globales
 - 🎯 Mi objetivo es especializarme como **Product Manager**, con foco en IA aplicada a producto
-- 🧪 Aprendo haciendo: gestiono mi propio emprendimiento de e-commerce ([Volfati]([https://www.mercadolibre.com.ar](https://www.mercadolibre.com.ar/pagina/volfati#from=share_eshop))) y construyo herramientas de software por mi cuenta
+- 🧪 Aprendo haciendo: gestiono mi propio emprendimiento de e-commerce ([Volfati]([https://www.mercadolibre.com.ar](https://www.mercadolibre.com.ar/pagina/volfati#from=share_eshop)) y construyo herramientas de software por mi cuenta
 - 📊 Formación en datos: Python, SQL, Pandas, Machine Learning (Kaggle Learn)
 - 🤖 Formación en IA aplicada (Anthropic Academy: AI Fluency, Claude 101, Agent Skills)
 
