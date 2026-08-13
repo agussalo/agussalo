@@ -41,5 +41,5 @@ Combino formación en negocio y datos con experiencia real construyendo software
 
 ### 📫 Contacto
 
-- LinkedIn: linkedin.com/in/agustín-salomone-7829a2377
+- LinkedIn: [linkedin.com/in/agustín-salomone-7829a2377](https://www.linkedin.com/in/agust%C3%ADn-salomone-7829a2377/)
 - Email: agussalo2007@gmail.com
