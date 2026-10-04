@@ -91,7 +91,28 @@ En vez de invertir siempre todo el capital, se invierte lo justo para que, **si 
 
 Mismo Sharpe, porque la **calidad** de la estrategia no cambió: se achica todo proporcionalmente. Ganás menos y la caída máxima baja más o menos igual de rápido. Eso es lo que controlás: cuánto riesgo aguantás, no si la estrategia es buena. Hacé las cuentas desde la caída: si no soportarías ver −38% en tu cuenta, no uses todo el capital. (Simplificación: se asume que la fracción invertida se mantiene constante durante la operación.)
 
-## 7. Ruta recomendada
+## 7. Paper trading: el bot en vivo, sin dinero real
+
+El bot (`run_bot.py`) aplica la misma regla que el backtest cada vez que cierra una vela: señal, stop-loss, tamaño por riesgo y espera tras un stop. Tiene dos modos:
+
+1. **`--mode sim`** (empezá por acá, no necesita claves): usa precios reales públicos pero las órdenes son ficticias, en una cuenta simulada local de 10.000.
+   `python run_bot.py --mode sim --stop 0.03 --risk 0.01`
+2. **`--mode testnet`**: manda órdenes de verdad al *testnet* de Binance (dinero ficticio). Pasos:
+   - Entrá a https://testnet.binance.vision, iniciá sesión y generá una API key.
+   - Cargala como variables de entorno (nunca en el código ni en el repo):
+     `export TESTNET_API_KEY=...` y `export TESTNET_API_SECRET=...`
+   - `python run_bot.py --mode testnet`
+
+Medidas de seguridad: no hay modo de dinero real. El modo testnet se niega a arrancar si el exchange no quedó en sandbox. Si falla la red, el bot reintenta en vez de operar a ciegas. Al arrancar, si la señal ya estaba "dentro", **no entra a mitad de tendencia**: espera a que la señal pase por 0. Cada operación queda en `paper_trades.csv` y el estado en `bot_state.json`, así podés cortarlo y retomarlo.
+
+Limitaciones a tener en cuenta:
+- El stop lo vigila el bot cada 30 s (no es una orden en el exchange), así que si el bot se cae, la posición queda sin stop.
+- Entra al precio de mercado al cerrar la vela (el backtest asume el *open* siguiente; son casi iguales).
+- Solo opera largo (spot), un activo.
+
+**Qué mirar durante semanas:** comparar `paper_trades.csv` con lo que habría hecho el backtest en ese período. Si difieren mucho (por costos, deslizamiento o errores), hay algo que corregir antes de pensar en dinero real.
+
+## 8. Ruta recomendada
 1. Correr y modificar las simulaciones hasta que te cierren. 
 2. Backtest de las estrategias del repo con datos reales (`run_backtest.py`).
 3. Probar stop-loss y walk-forward con datos reales (`--stop`, `--walk-forward`).
