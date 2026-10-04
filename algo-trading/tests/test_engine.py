@@ -37,3 +37,11 @@ def test_sin_look_ahead():
     df = _df([100, 100, 110], [100, 110, 110], [100, 100, 110], [100, 110, 110])
     r = engine.run(df, pd.Series([0.0, 1.0, 0.0], index=df.index), fee=0, slippage=0)
     assert r.returns.iloc[1] == 0
+
+
+def test_tamano_por_riesgo_limita_la_perdida_del_stop():
+    df = _df([100, 100, 100, 90], [100, 101, 100, 91], [100, 99, 90, 89], [100, 100, 96, 90])
+    pos = pd.Series([1.0] * 4, index=df.index)
+    r = engine.run_with_stop(df, pos, stop=0.05, fee=0, slippage=0, risk=0.01)  # f = 0.2
+    assert np.isclose(r.returns.iloc[2], -0.01)
+    assert np.isclose(r.position.max(), 0.2)

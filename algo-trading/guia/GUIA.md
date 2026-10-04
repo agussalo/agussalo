@@ -78,10 +78,23 @@ python run_backtest.py --synthetic --walk-forward --strategy rsi_reversion      
 
 Resultado en el mercado simulado: el cruce de medias dio +121,6% fuera de muestra (Sharpe 5,5) y el RSI −39,6% (comprar y mantener: −5,7%). Ojo con el primero: **los datos sintéticos tienen una tendencia cíclica incorporada**, por eso una estrategia de tendencia funciona tan bien. En precios reales un Sharpe así sería sospechoso. Lo que sí enseña el ejemplo: el walk-forward descarta sin piedad a la estrategia que no tiene ventaja.
 
+### Tamaño de posición por riesgo (`--risk`)
+En vez de invertir siempre todo el capital, se invierte lo justo para que, **si salta el stop, pierdas solo un porcentaje fijo** (por ejemplo 1%): fracción invertida = riesgo ÷ distancia del stop. Con stop 3% y riesgo 1%, se invierte 1/3 del capital. Sin apalancamiento (nunca más del 100%).
+
+`python run_backtest.py --synthetic --stop 0.03 --risk 0.01`
+
+| Stop 3% | Retorno | Sharpe | Caída máxima |
+|---|---|---|---|
+| todo el capital | +53,7% | 2,08 | −38,3% |
+| riesgo 2% por operación | +33,9% | 2,08 | −27,4% |
+| riesgo 1% por operación | +16,0% | 2,08 | −14,8% |
+
+Mismo Sharpe, porque la **calidad** de la estrategia no cambió: se achica todo proporcionalmente. Ganás menos y la caída máxima baja más o menos igual de rápido. Eso es lo que controlás: cuánto riesgo aguantás, no si la estrategia es buena. Hacé las cuentas desde la caída: si no soportarías ver −38% en tu cuenta, no uses todo el capital. (Simplificación: se asume que la fracción invertida se mantiene constante durante la operación.)
+
 ## 7. Ruta recomendada
 1. Correr y modificar las simulaciones hasta que te cierren. 
 2. Backtest de las estrategias del repo con datos reales (`run_backtest.py`).
-3. Probar stop-loss y walk-forward con datos reales (`--stop`, `--walk-forward`). Pendiente en el repo: tamaño de posición por riesgo.
+3. Probar stop-loss y walk-forward con datos reales (`--stop`, `--walk-forward`).
 4. Paper trading en el testnet durante semanas/meses.
 5. Dinero real solo si el paper trading coincide con el backtest, con un monto que puedas perder entero.
 

@@ -46,13 +46,17 @@ def stats(df, ret, equity, pos, turnover) -> dict:
     }
 
 
-def run_with_stop(df, position, stop=0.02, fee=0.001, slippage=0.0005, capital=10_000.0) -> Result:
+def run_with_stop(df, position, stop=0.02, fee=0.001, slippage=0.0005, capital=10_000.0, risk=None) -> Result:
     """Como `run`, pero cierra la posicion si el minimo de la vela toca entrada*(1-stop).
 
     - Entrada al `open` de la vela siguiente a la senal; salida por stop al precio del stop
       (o al `open` si la vela abre con gap por debajo).
     - Tras un stop se queda afuera hasta que la senal pase por 0 y vuelva a 1 (evita reentrar al instante).
+    - `risk` (ej. 0.01 = 1%): tamano de posicion para perder ~`risk` del capital si salta el stop.
+      Se invierte la fraccion f = min(1, risk/stop) del capital (sin apalancamiento). Se asume que f
+      se mantiene constante mientras dura la operacion (simplificacion).
     """
+    f = min(1.0, risk / stop) if risk else 1.0
     want = position.shift(1).fillna(0.0).to_numpy()
     o, l, c = (df[k].to_numpy() for k in ("open", "low", "close"))
     cost = fee + slippage
@@ -78,6 +82,8 @@ def run_with_stop(df, position, stop=0.02, fee=0.001, slippage=0.0005, capital=1
             in_pos, entry = True, o[i]
             ret[i], pos[i] = c[i] / o[i] - 1 - cost, 1.0
         ref = c[i]
+    ret *= f
+    pos *= f
     ret_s = pd.Series(ret, index=df.index)
     equity = capital * (1 + ret_s).cumprod()
     pos_s = pd.Series(pos, index=df.index)

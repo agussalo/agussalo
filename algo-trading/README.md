@@ -9,6 +9,7 @@ python run_backtest.py --strategy sma_cross --symbol BTC/USDT --days 365
 python run_backtest.py --strategy rsi_reversion --synthetic   # sin internet
 python run_backtest.py --synthetic --stop 0.03                # con stop-loss 3%
 python run_backtest.py --synthetic --walk-forward --stop 0.03 # validacion fuera de muestra
+python run_backtest.py --synthetic --stop 0.03 --risk 0.01    # arriesga 1% del capital por operacion
 python -m pytest tests                                        # tests del motor
 ```
 

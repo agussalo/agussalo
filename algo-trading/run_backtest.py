@@ -30,12 +30,15 @@ def main():
     p.add_argument("--fee", type=float, default=0.001)
     p.add_argument("--slippage", type=float, default=0.0005)
     p.add_argument("--stop", type=float, default=None, help="stop-loss como fraccion, ej. 0.03 = 3%%")
+    p.add_argument("--risk", type=float, default=None, help="riesgo por operacion como fraccion del capital (requiere --stop), ej. 0.01")
     p.add_argument("--walk-forward", action="store_true", help="optimiza en ventanas moviles y mide fuera de muestra")
     p.add_argument("--train", type=int, default=2000, help="velas de entrenamiento (walk-forward)")
     p.add_argument("--test", type=int, default=500, help="velas de prueba (walk-forward)")
     p.add_argument("--synthetic", action="store_true")
     p.add_argument("--out", default="equity.png")
     a = p.parse_args()
+    if a.risk and not a.stop:
+        p.error("--risk requiere --stop")
 
     df = (
         data.synthetic_ohlcv()
@@ -45,7 +48,7 @@ def main():
     strat = STRATEGIES[a.strategy]
 
     if a.walk_forward:
-        oos, elegidos = walk_forward(df, strat, GRIDS[a.strategy], a.train, a.test, a.stop, a.fee, a.slippage)
+        oos, elegidos = walk_forward(df, strat, GRIDS[a.strategy], a.train, a.test, a.stop, a.fee, a.slippage, risk=a.risk)
         for t, params, sh in elegidos:
             print(f"{t:%Y-%m-%d} eligio {params} (Sharpe en entrenamiento {sh:+.2f})")
         print("\nRESULTADO FUERA DE MUESTRA (lo unico honesto):")
@@ -54,7 +57,7 @@ def main():
         return
 
     pos = strat(df)
-    res = engine.run_with_stop(df, pos, a.stop, a.fee, a.slippage) if a.stop else engine.run(df, pos, a.fee, a.slippage)
+    res = engine.run_with_stop(df, pos, a.stop, a.fee, a.slippage, risk=a.risk) if a.stop else engine.run(df, pos, a.fee, a.slippage)
 
     for k, v in res.stats.items():
         print(f"{k:>18}: {v:.2%}" if isinstance(v, float) and k != "sharpe" else f"{k:>18}: {v:.2f}" if k == "sharpe" else f"{k:>18}: {v}")

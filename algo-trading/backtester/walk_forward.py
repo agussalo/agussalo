@@ -7,7 +7,7 @@ import pandas as pd
 from . import engine
 
 
-def walk_forward(df, strategy, grid, train=2000, test=500, stop=None, fee=0.001, slippage=0.0005, min_trades=5):
+def walk_forward(df, strategy, grid, train=2000, test=500, stop=None, fee=0.001, slippage=0.0005, min_trades=5, risk=None):
     """grid: dict {param: [valores]}. Devuelve (retornos fuera de muestra, lista de parametros elegidos)."""
     names = list(grid)
     combos = [dict(zip(names, v)) for v in itertools.product(*grid.values())]
@@ -15,7 +15,7 @@ def walk_forward(df, strategy, grid, train=2000, test=500, stop=None, fee=0.001,
     def backtest(sl, params, lo):
         pos = strategy(df.iloc[sl], **params)  # senal con calentamiento previo
         d, p = df.iloc[sl].iloc[lo:], pos.iloc[lo:]
-        return engine.run_with_stop(d, p, stop, fee, slippage) if stop else engine.run(d, p, fee, slippage)
+        return engine.run_with_stop(d, p, stop, fee, slippage, risk=risk) if stop else engine.run(d, p, fee, slippage)
 
     oos, elegidos = [], []
     start = 0
